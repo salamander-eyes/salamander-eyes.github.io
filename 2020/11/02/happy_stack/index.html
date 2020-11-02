@@ -5,12 +5,12 @@
 <meta property="og:site_name" content="Huken">
 <meta property="og:description" content="happy_stack 本地可打通，远程打不通 莫名其妙 这种栈的基础rop最近做了level3happy_stack                     happy_stack       首先checksec 64位再在ida中查看发现是一个绕过和栈基础rop 绕过没搞懂，主要看下rop                     exp       123456789101112131415">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://example.com/2020/11/02/images/happy_stack_1.PNG">
+<meta property="og:image" content="http://example.com/2020/11/02/happy_stack/happy_stack/happy_stack_1.PNG">
 <meta property="article:published_time" content="2020-11-02T01:06:45.000Z">
-<meta property="article:modified_time" content="2020-11-02T12:44:06.323Z">
+<meta property="article:modified_time" content="2020-11-02T12:59:08.223Z">
 <meta property="article:author" content="huken">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2020/11/02/images/happy_stack_1.PNG"><title>happy_stack | Huken</title><link ref="canonical" href="http://example.com/2020/11/02/happy_stack/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.2.0"><script>var Stun = window.Stun || {};
+<meta name="twitter:image" content="http://example.com/2020/11/02/happy_stack/happy_stack/happy_stack_1.PNG"><title>happy_stack | Huken</title><link ref="canonical" href="http://example.com/2020/11/02/happy_stack/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.2.0"><script>var Stun = window.Stun || {};
 var CONFIG = {
   root: '/',
   algolia: undefined,
@@ -55,7 +55,7 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.2.0"></he
           <a href="#调试时的一些小技巧" class="heading-link"><i class="fas fa-link"></i></a>调试时的一些小技巧</h3>
       <ul>
 <li>gdb.attach()进入调试之后的位置就是其所在的位置，所以把它放到合适的位置就能在调试时省去一些麻烦</li>
-<li>设置断点可以是以函数为断点，也可以是exp的具体行数<br><img src="./../images/happy_stack_1.PNG" alt="设置断点"></li>
+<li>设置断点可以是以函数为断点，也可以是exp的具体行数<br><img src="./happy_stack/happy_stack_1.PNG" alt="设置断点"></li>
 </ul>
 
         <h2 id="2-对此知识点的一些理解"   >
