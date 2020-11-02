@@ -49,15 +49,20 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.2.0"></he
           <a href="#调试时的一些小技巧" class="heading-link"><i class="fas fa-link"></i></a>调试时的一些小技巧</h3>
       <ul>
 <li>gdb.attach()进入调试之后的位置就是其所在的位置，所以把它放到合适的位置就能在调试时省去一些麻烦</li>
-<li>设置断点可以是以函数为断点，也可以是exp的具体行数<br><img src="./happy_stack/happy_stack_1.PNG" alt="设置断点"></li>
+<li>设置断点可以是以函数为断点，也可以是exp的具体行数<br><img src="./happy_stack/happy_stack_1.PNG" alt="设置断点">
+        <h3 id="查看参数入栈"   >
+          <a href="#查看参数入栈" class="heading-link"><i class="fas fa-link"></i></a>查看参数入栈</h3>
+      查看 system(“/bin/sh”) 入栈 （带上one_gadget 和 ret对齐）<br>(发现ret对其会导致程序进入无法继续运行的地址,所以去掉了)<br>首先是<br><img src="./happy_stack/2.PNG" alt="设置断点"><br>划线处，既是通过溢出覆盖了函数返回地址。栈上依次是<br>one_gadget<br>“/bin/sh”<br>system()<br>运行到one_gadget看一下<br><img src="./happy_stack/3.PNG" alt="设置断点"><br>pop rdi<br>可以看出来poprdi小工具的用处就是放入参数，由于这里是64位 ，所以参数先从寄存器开始放，第一个正是rax<br>ret<br>将 “/bin/sh” 一开始所在栈的下一个栈作为返回地址</li>
 </ul>
 
         <h2 id="2-对此知识点的一些理解"   >
           <a href="#2-对此知识点的一些理解" class="heading-link"><i class="fas fa-link"></i></a>2. 对此知识点的一些理解</h2>
-      
+      <p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://blog.csdn.net/wulou4hao/article/details/109126178" >参考另一博客</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+
         <h2 id="3-为何不用-system-“-bin-sh”"   >
           <a href="#3-为何不用-system-“-bin-sh”" class="heading-link"><i class="fas fa-link"></i></a>3. 为何不用 system(“/bin/sh”)</h2>
-      
+      <p>一开始准备使用 system(“/bin/sh”) 但是不能成功，后来看到一句话说：可能是因为他只能压入一个参数 sh 而我在看栈里的数据时得到的也正是这样的结果</p>
+
         <h2 id="4-其他"   >
           <a href="#4-其他" class="heading-link"><i class="fas fa-link"></i></a>4. 其他</h2>
       <p>在调level3时，泄露出来的write地址不变化，后来加上了sendlineafter() 结果write地址就正确的发生变化了。<br>这里有两个疑点：<br>（1） sendlineafter()比sendline()多了个接收为什么会造成这样的影响<br>（2） 一开始用sendline()后收到的地址到底是什么呢</p>

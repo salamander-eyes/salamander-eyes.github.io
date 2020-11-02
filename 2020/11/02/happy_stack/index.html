@@ -6,8 +6,10 @@
 <meta property="og:description" content="happy_stack 本地可打通，远程打不通 莫名其妙 这种栈的基础rop最近做了level3happy_stack                     happy_stack       首先checksec 64位再在ida中查看发现是一个绕过和栈基础rop 绕过没搞懂，主要看下rop                     exp       123456789101112131415">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2020/11/02/happy_stack/happy_stack/happy_stack_1.PNG">
+<meta property="og:image" content="http://example.com/2020/11/02/happy_stack/happy_stack/2.PNG">
+<meta property="og:image" content="http://example.com/2020/11/02/happy_stack/happy_stack/3.PNG">
 <meta property="article:published_time" content="2020-11-02T01:06:45.000Z">
-<meta property="article:modified_time" content="2020-11-02T12:59:08.223Z">
+<meta property="article:modified_time" content="2020-11-02T13:26:05.051Z">
 <meta property="article:author" content="huken">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2020/11/02/happy_stack/happy_stack/happy_stack_1.PNG"><title>happy_stack | Huken</title><link ref="canonical" href="http://example.com/2020/11/02/happy_stack/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.2.0"><script>var Stun = window.Stun || {};
@@ -55,15 +57,20 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.2.0"></he
           <a href="#调试时的一些小技巧" class="heading-link"><i class="fas fa-link"></i></a>调试时的一些小技巧</h3>
       <ul>
 <li>gdb.attach()进入调试之后的位置就是其所在的位置，所以把它放到合适的位置就能在调试时省去一些麻烦</li>
-<li>设置断点可以是以函数为断点，也可以是exp的具体行数<br><img src="./happy_stack/happy_stack_1.PNG" alt="设置断点"></li>
+<li>设置断点可以是以函数为断点，也可以是exp的具体行数<br><img src="./happy_stack/happy_stack_1.PNG" alt="设置断点">
+        <h3 id="查看参数入栈"   >
+          <a href="#查看参数入栈" class="heading-link"><i class="fas fa-link"></i></a>查看参数入栈</h3>
+      查看 system(“/bin/sh”) 入栈 （带上one_gadget 和 ret对齐）<br>(发现ret对其会导致程序进入无法继续运行的地址,所以去掉了)<br>首先是<br><img src="./happy_stack/2.PNG" alt="设置断点"><br>划线处，既是通过溢出覆盖了函数返回地址。栈上依次是<br>one_gadget<br>“/bin/sh”<br>system()<br>运行到one_gadget看一下<br><img src="./happy_stack/3.PNG" alt="设置断点"><br>pop rdi<br>可以看出来poprdi小工具的用处就是放入参数，由于这里是64位 ，所以参数先从寄存器开始放，第一个正是rax<br>ret<br>将 “/bin/sh” 一开始所在栈的下一个栈作为返回地址</li>
 </ul>
 
         <h2 id="2-对此知识点的一些理解"   >
           <a href="#2-对此知识点的一些理解" class="heading-link"><i class="fas fa-link"></i></a>2. 对此知识点的一些理解</h2>
-      
+      <p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://blog.csdn.net/wulou4hao/article/details/109126178" >参考另一博客</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+
         <h2 id="3-为何不用-system-“-bin-sh”"   >
           <a href="#3-为何不用-system-“-bin-sh”" class="heading-link"><i class="fas fa-link"></i></a>3. 为何不用 system(“/bin/sh”)</h2>
-      
+      <p>一开始准备使用 system(“/bin/sh”) 但是不能成功，后来看到一句话说：可能是因为他只能压入一个参数 sh 而我在看栈里的数据时得到的也正是这样的结果</p>
+
         <h2 id="4-其他"   >
           <a href="#4-其他" class="heading-link"><i class="fas fa-link"></i></a>4. 其他</h2>
       <p>在调level3时，泄露出来的write地址不变化，后来加上了sendlineafter() 结果write地址就正确的发生变化了。<br>这里有两个疑点：<br>（1） sendlineafter()比sendline()多了个接收为什么会造成这样的影响<br>（2） 一开始用sendline()后收到的地址到底是什么呢</p>
@@ -71,7 +78,8 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.2.0"></he
           happy_stack</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#exp"><span class="toc-number">1.1.</span> <span class="toc-text">
           exp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-gdb%E8%B0%83%E8%AF%95-%E8%B0%83%E8%AF%95%E6%97%B6%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7%EF%BC%8C%E6%9F%A5%E7%9C%8B%E5%8F%82%E6%95%B0%E5%85%A5%E6%A0%88%EF%BC%8Cpoprdi%E5%B0%8F%E5%B7%A5%E5%85%B7%E7%9A%84%E7%94%A8%E5%A4%84"><span class="toc-number">1.2.</span> <span class="toc-text">
           1. gdb调试 调试时的一些小技巧，查看参数入栈，poprdi小工具的用处</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E8%AF%95%E6%97%B6%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7"><span class="toc-number">1.2.1.</span> <span class="toc-text">
-          调试时的一些小技巧</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%B9%E6%AD%A4%E7%9F%A5%E8%AF%86%E7%82%B9%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3"><span class="toc-number">1.3.</span> <span class="toc-text">
+          调试时的一些小技巧</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%8F%82%E6%95%B0%E5%85%A5%E6%A0%88"><span class="toc-number">1.2.2.</span> <span class="toc-text">
+          查看参数入栈</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%B9%E6%AD%A4%E7%9F%A5%E8%AF%86%E7%82%B9%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3"><span class="toc-number">1.3.</span> <span class="toc-text">
           2. 对此知识点的一些理解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%BA%E4%BD%95%E4%B8%8D%E7%94%A8-system-%E2%80%9C-bin-sh%E2%80%9D"><span class="toc-number">1.4.</span> <span class="toc-text">
           3. 为何不用 system(“&#x2F;bin&#x2F;sh”)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%85%B6%E4%BB%96"><span class="toc-number">1.5.</span> <span class="toc-text">
           4. 其他</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">hello world</p></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">Archives</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">2</div><div class="sidebar-ov-state-item__name">Categories</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="Creative Commons" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">You have read </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2020</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>huken</span></div><div><span>Powered by <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a></span><span> v5.2.0</span><span class="footer__devider">|</span><span>Theme - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.2.0</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="/js/utils.js?v=2.2.0"></script><script src="/js/stun-boot.js?v=2.2.0"></script><script src="/js/scroll.js?v=2.2.0"></script><script src="/js/header.js?v=2.2.0"></script><script src="/js/sidebar.js?v=2.2.0"></script></body></html>
